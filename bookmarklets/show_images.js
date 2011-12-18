@@ -1,0 +1,1 @@
+javascript:n='';for(i=0;i%3Cdocument.images.length;i++)%7Bn+='%3Cimg%20src='+document.images%5Bi%5D.src+'%3E%20'+document.images%5Bi%5D.width+'x'+document.images%5Bi%5D.height+'%3Cbr%3E%3Cbr%3E'%7D;if(n!='')%7Bdocument.write('%3Cp%20style=font-size:11px;font-family:verdana,sans;%3E'+n+'%3C/p%3E');void(document.close())%7Delse%7Balert('i%20see%20no%20images')%7D
