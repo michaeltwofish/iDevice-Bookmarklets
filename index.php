@@ -6,6 +6,24 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta http-equiv="content-language" content="en" /> 
     <meta name="viewport" content="initial-scale=1,user-scalable=yes" />
+    <style>
+      .bookmarklet { display: none }
+    </style>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+
+    <script>
+    $(document).ready(function() {
+      $('textarea').on('focus', function() {
+        this.setSelectionRange(0, this.value.length);
+      });
+      $('select:first').on('change', function() {
+        $('.bookmarklet').hide();
+        var bookmarklet = $(this).find(':selected').attr('value');
+        $('#'+bookmarklet).show().find('textarea').first().focus();
+      });
+    });
+    </script>
+
   </head>
 
   <body>
@@ -23,20 +41,28 @@
 
     <h2>Bookmarklets:</h2>
 
+    <form action="#">
+      <label>Select a bookmarklet:
+        <select>
+        <?php
+          $dir = 'bookmarklets';
+          $iterator = new DirectoryIterator(implode(DIRECTORY_SEPARATOR, array(dirname(__FILE__),$dir)));
+          $bookmarklets = array();
+          foreach ($iterator as $fileinfo) {
+            if ($fileinfo->isFile()) {
+              $name = $fileinfo->getBasename('.js');
+              $display_name = ucwords(str_replace('_', ' ', $name));
+              $bookmarklets[$name] = array('display' => $display_name, 'js' => file_get_contents(implode(DIRECTORY_SEPARATOR, array($dir,$fileinfo->getFilename()))));
+              echo "<option value='{$name}'>{$display_name}</option>";
+            }
+          }
+        ?>
+        </select>
+      </label>
+    </form>
     <?php
-      $dir = 'bookmarklets';
-      $iterator = new DirectoryIterator(implode(DIRECTORY_SEPARATOR, array(dirname(__FILE__),$dir)));
-      $bookmarklets = array();
-      foreach ($iterator as $fileinfo) {
-        if ($fileinfo->isFile()) {
-          $name = $fileinfo->getBasename('.js');
-          $display_name = ucwords(str_replace('_', ' ', $name));
-          $bookmarklets[$name] = array('display' => $display_name, 'js' => file_get_contents(implode(DIRECTORY_SEPARATOR, array($dir,$fileinfo->getFilename()))));
-          echo "<li><a href='#{$name}'>{$display_name}</a></li>";
-        }
-      }
       foreach ($bookmarklets as $name => $bookmarklet) {
-        echo "<div><h3><a name='{$name}'>{$bookmarklet['display']}</a></h3><textarea name='code' cols='50' rows='10'>{$bookmarklet['js']}</textarea></div>";
+        echo "<div id='{$name}' class='bookmarklet'><h3>{$bookmarklet['display']}</h3><textarea name='code' cols='50' rows='10'>{$bookmarklet['js']}</textarea></div>";
       }
     ?>
 
